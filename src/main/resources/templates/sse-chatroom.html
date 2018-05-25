@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SSE ChatRoom</title>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+<h1>My Test Chatroom</h1>
+
+<script>
+    // 监听关闭浏览器就退出登陆
+    window.onbeforeunload = onbeforeunload_handler;
+    window.onunload = onunload_handler;
+
+    // 关闭浏览器时，先执行这个函数
+    function onbeforeunload_handler() {
+        var warning = "确认退出?";
+        console.log("onbeforeunload_handler");
+        return warning;
+    }
+
+    // 关闭浏览器时，后执行这个函数
+    function onunload_handler() {
+        console.log("onunload_handler");
+        // 可以在调用注销API
+    }
+
+    var source = new EventSource('http://localhost:8080/sse/push/' + guid());  //指定路由发送
+    source.onmessage = function (e) {  //监听信息的传输
+        var data = JSON.parse(e.data),
+            origin = e.origin;
+        console.log(data);
+    };
+
+    source.onerror = function (e) { //当连接发生error时触发
+        console.log(e);
+    };
+
+    source.onopen = function (e) { //当连接正式建立时触发
+        console.log(e);
+    };
+
+    function guid() {
+        function S4() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+    }
+
+</script>
+</body>
+</html>

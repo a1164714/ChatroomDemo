@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ChatRoom</title>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body>
+<h1>My Test Chatroom</h1>
+
+<script>
+    function guid() {
+        function S4() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+    }
+
+    var guid = guid();
+
+    function longPolling() {
+        $.ajax({
+            url: "http://localhost:8080/defer/push/" + guid,
+            // data: {'userID': 111},
+            dataType: 'json',
+            timeout: 30000,
+            cache: false,
+            type: "get",
+            success: function (data) {
+                if (data.status == 1) {
+                    // 有消息
+                    alert(data.data);
+                    window.setTimeout(longPolling, 1000)
+                } else if (data.status == 2) {
+                    // 没有消息
+                    window.setTimeout(longPolling, 1000);
+                } else {
+                    // 超时
+                    window.setTimeout(longPolling, 10000);
+                }
+            },
+            error: function (xhr, err) {//如果出现错误，则在十秒钟之后，再进行长轮询
+                window.setTimeout(longPolling, 10000)
+            }
+        })
+    }
+    longPolling();
+</script>
+</body>
+</html>
